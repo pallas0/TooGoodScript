@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'toogood.apps.ToogoodConfig' #added per youtube vid
 ]
 
 MIDDLEWARE = [
