@@ -13,27 +13,20 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
 
+#kinda brute forcing db.create_all, commented out bc it's already created
+# with app.app_context():
+#     db.create_all()
+        
+
+@app.route('/')
 def process_users():
     users = User.query.all()
     for user in users:
-        print(user)
-        #email = user.email
-        #print(email)
-        # client = TgtgClient(email=email)
-        # credentials = client.get_credentials()
-        #print(credentials)
-        
-with app.app_context():
-    print("hi")
-    db.create_all()
-#     def process_users():
-#         users = User.query.all()
-#         for user in users:
-#             print(user)
-#     process_users()
-
-
-
+        email = user.email
+        client = TgtgClient(email=email)
+        credentials = client.get_credentials()
+        print(credentials)
+    return 'yay'
 
 
 #route to see database (for debug purposes)
