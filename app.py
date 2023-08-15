@@ -24,8 +24,13 @@ def process_users():
         #print(credentials)
         
 with app.app_context():
+    print("hi")
     db.create_all()
-    process_users()
+#     def process_users():
+#         users = User.query.all()
+#         for user in users:
+#             print(user)
+#     process_users()
 
 
 
@@ -35,5 +40,4 @@ with app.app_context():
 @app.route('/users')
 def list_users():
     users = User.query.all()
-    print('hi')
     return '\n'.join([f"{user.id}: {user.email}, {user.phone_number}" for user in users])
