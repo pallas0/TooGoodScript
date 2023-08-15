@@ -2,9 +2,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-# Replace 'your_database_uri' with the actual connection URI to your PostgreSQL database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ameliarisner:123@localhost:5432/toogood'
 
+#database creation and set up
 db = SQLAlchemy(app)
 
 class User(db.Model):
@@ -15,7 +15,14 @@ class User(db.Model):
 
 with app.app_context():
     db.create_all()
+    # new_user = User(email='amelia.risner0@gmail.com', phone_number='4076339712')
+    # db.session.add(new_user)
+    # db.session.commit()
 
+
+
+
+#route to see database (for debug purposes)
 @app.route('/users')
 def list_users():
     users = User.query.all()
