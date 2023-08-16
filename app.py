@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from tgtg import TgtgClient
 
 app = Flask(__name__)
@@ -7,30 +8,48 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ameliarisner:123@localhost
 
 #database creation and set up
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-class User(db.Model):
+class Subscriber(db.Model):
+    __tablename__ = 'subscriber'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
+
+class Credential(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    access_token = db.Column(db.String(255), nullable=False)
+    refresh_token = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.Integer, unique=True, nullable=False)
+    cookie = db.Column(db.String(255))
+    subscriber_id = db.Column(db.Integer, db.ForeignKey('subscriber.id'), unique=True, nullable=False)
+    subscriber = db.relationship('Subscriber', backref='credential', uselist=False)
+
+class Favorite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    new_bags = db.Column(db.Boolean, nullable=False)
+    subscriber_id = db.Column(db.Integer, db.ForeignKey('subscriber.id'), nullable=False)
+    subscriber = db.relationship('Subscriber', backref='favorites')
 
 #kinda brute forcing db.create_all, commented out bc it's already created
 # with app.app_context():
 #     db.create_all()
         
 
-@app.route('/')
-def process_users():
-    users = User.query.all()
-    for user in users:
-        email = user.email
-        client = TgtgClient(email=email)
-        credentials = client.get_credentials()
-        print(credentials)
-    return 'yay'
+# @app.route('/')
+# def process_subscribers():
+#     subscribers = Subscriber.query.all()
+#     for subscriber in subscribers:
+#         email = subscriber.email
+#         client = TgtgClient(email=email)
+#         credentials = client.get_credentials()
+#         print(credentials)
+#     return 'yay'
 
 
 #route to see database (for debug purposes)
-@app.route('/users')
-def list_users():
-    users = User.query.all()
-    return '\n'.join([f"{user.id}: {user.email}, {user.phone_number}" for user in users])
+@app.route('/subscribers')
+def list_subscribers():
+    subscribers = Subscriber.query.all()
+    return '\n'.join([f"{subscriber.id}: {subscriber.email}, {subscriber.phone_number}" for subscriber in subscribers])
