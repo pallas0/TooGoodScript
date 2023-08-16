@@ -32,9 +32,11 @@ class Favorite(db.Model):
     subscriber_id = db.Column(db.Integer, db.ForeignKey('subscriber.id'), nullable=False)
     subscriber = db.relationship('Subscriber', backref='favorites')
 
-#kinda brute forcing db.create_all, commented out bc it's already created
+#manually added for testing purposes
 # with app.app_context():
-#     db.create_all()
+#     new_subscriber = Subscriber(email='amelia.risner0@gmail.com', phone_number='4076339712')
+#     db.session.add(new_subscriber)
+#     db.session.commit()
         
 
 # @app.route('/')
