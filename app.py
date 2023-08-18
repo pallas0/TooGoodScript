@@ -15,23 +15,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 
 
-#manually added for testing purposes
-# with app.app_context():
-#     new_subscriber = Subscriber(email='example@gmail.com', phone_number='example')
-#     db.session.add(new_subscriber)
-#     db.session.commit()
-        
-
-# @app.route('/')
-# def process_subscribers():
-#     subscribers = Subscriber.query.all()
-#     for subscriber in subscribers:
-#         email = subscriber.email
-#         client = TgtgClient(email=email)
-#         credentials = client.get_credentials()
-#         print(credentials)
-#     return 'yay'
-
 
 #route to see database (for debug purposes)
 @app.route('/subscribers')
