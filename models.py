@@ -11,6 +11,7 @@ class Subscriber(db.Model):
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
 
 class Credential(db.Model):
+    __tablename__ = 'credential'
     id = db.Column(db.Integer, primary_key=True)
     access_token = db.Column(db.String(255), nullable=False)
     refresh_token = db.Column(db.String(255), nullable=False)
@@ -20,6 +21,7 @@ class Credential(db.Model):
     subscriber = db.relationship('Subscriber', backref='credential', uselist=False)
 
 class Favorite(db.Model):
+    __tablename__ = 'favorite'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     new_bags = db.Column(db.Boolean, nullable=False)
