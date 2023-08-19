@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from tgtg import TgtgClient
 
-from models import db, Subscriber, Credential, Favorite
+from models import Credential, db, Favorite, Subscriber
 
 DATABASE_URI = os.environ.get("DATABASE_URI")
 
