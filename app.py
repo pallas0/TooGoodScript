@@ -16,14 +16,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-#temporarily leaving this here 
-# def clear_table(table):
-#     db.session.query(table).delete()
-#     db.session.commit()
-    
-# with app.app_context():
-#     clear_table(Subscriber)
-
 
 #route to see database (for debug purposes)
 @app.route('/subscribers')
