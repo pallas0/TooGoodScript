@@ -40,6 +40,7 @@ def submit_subscriber_info():
 
     email = new_subscriber.email
     client = TgtgClient(email=email)
+    #stalls here until credentials are returned (requires user approval via app or email)
     credentials_data = client.get_credentials()
 
     credential = Credential(
