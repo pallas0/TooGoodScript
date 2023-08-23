@@ -47,7 +47,7 @@ def submit_subscriber_info():
         refresh_token=credentials_data['refresh_token'],
         user_id=credentials_data['user_id'],
         cookie=credentials_data['cookie'],
-        subscriber_id=new_subscriber.id  # Assuming subscriber.id is the ID of the newly added subscriber
+        subscriber_id=new_subscriber.id  
     )
 
     db.session.add(credential)
