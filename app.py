@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from tgtg import TgtgClient
@@ -13,6 +14,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
 db.init_app(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 
 
@@ -24,12 +26,17 @@ def list_subscribers():
 
 @app.route('/submit_subscriber_info', methods=['POST'])
 def submit_subscriber_info():
-    data = request.json  # Assuming you're sending JSON data from React
+    data = request.json 
     email = data.get('email')
     phone_number = data.get('phone_number')
 
     new_subscriber = Subscriber(email=email, phone_number=phone_number)
     db.session.add(new_subscriber)
     db.session.commit()
+
+    email = new_subscriber.email
+    client = TgtgClient(email=email)
+    credentials = client.get_credentials()
+    #print(credentials)
 
     return jsonify({'message': 'Subscriber information added successfully'})
