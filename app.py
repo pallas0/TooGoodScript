@@ -18,6 +18,14 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 
 #route to see database (for debug purposes)
+@app.route('/get_favorites')
+def get_favorites():
+    credential_id = 1
+    credential = Credential.query.filter_by(id=credential_id).first()
+    client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
+    items = client.get_items()
+    return str(items)
+
 @app.route('/subscribers')
 def list_subscribers():
     subscribers = Subscriber.query.all()
