@@ -30,8 +30,8 @@ def create_favorites():
     for item in items:
         new_bags = item.get('items_available', 0) > 0
         name = item.get('display_name')
-        #new_favorite = Favorite(name=name, new_bags=new_bags, subscriber_id=credential.subscriber_id)
         #commented out to avoid duplicates
+        #new_favorite = Favorite(name=name, new_bags=new_bags, subscriber_id=credential.subscriber_id)
         # db.session.add(new_favorite)
         # db.session.commit()
 
