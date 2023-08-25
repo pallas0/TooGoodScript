@@ -17,7 +17,8 @@ db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 
-#route to see database (for debug purposes)
+#creates and shows user favorites
+#officially outside of app flow bc idk how to put these pieces together
 @app.route('/create_favorites')
 def create_favorites():
     credential_id = 1
