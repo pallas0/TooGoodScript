@@ -19,7 +19,7 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 #route to see database (for debug purposes)
 @app.route('/create_favorites')
-def get_favorites():
+def create_favorites():
     credential_id = 1
     credential = Credential.query.filter_by(id=credential_id).first()
     client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
@@ -27,8 +27,16 @@ def get_favorites():
 
     nums = ""
     for item in items:
-        nums += str(item.get('items_available', 0))+" "
-    return nums
+        new_bags = item.get('items_available', 0) > 0
+        name = item.get('display_name')
+        #new_favorite = Favorite(name=name, new_bags=new_bags, subscriber_id=credential.subscriber_id)
+        #commented out to avoid duplicates
+        # db.session.add(new_favorite)
+        # db.session.commit()
+
+    favorites = Favorite.query.all()
+    return '\n'.join([f"{favorite.id}: {favorite.name}, {favorite.new_bags}, {favorite.subscriber_id}" for favorite in favorites])
+    
 
 @app.route('/subscribers')
 def list_subscribers():
