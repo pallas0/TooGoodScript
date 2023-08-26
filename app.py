@@ -1,3 +1,13 @@
+"""
+Login / Subscribe Page
+- user inputs phone number + email 
+- validations
+    - we should show a confirmation message if the email
+  is indeed a too good to go account, if not  
+
+
+
+"""
 import os
 
 from flask import Flask, jsonify, request
@@ -16,6 +26,29 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
+
+@app.route('/check_new_bags')
+def check_bags():
+    subscribers = Subscriber.query.all()
+    for subscriber in subscribers:
+        credentials = subscriber.credential
+        if credentials:
+            credential = credentials[0]
+            client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
+            items = client.get_items()
+            for item in items:
+                item_name = item.get('display_name')
+                item_available = item.get('items_available', 0) > 0
+            
+                favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()
+            
+                if favorite:
+                    if favorite.new_bags != item_available:
+                        favorite.new_bags = item_available
+                        db.session.commit()
+    return 'yay'
+
+    
 
 @app.route('/favorites')
 def get_favorites():
