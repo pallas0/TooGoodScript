@@ -17,24 +17,8 @@ db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 
-#creates and shows user favorites
-#officially outside of app flow bc idk how to put these pieces together
-@app.route('/create_favorites')
-def create_favorites():
-    credential_id = 1
-    credential = Credential.query.filter_by(id=credential_id).first()
-    client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
-    items = client.get_items()
-
-    nums = ""
-    for item in items:
-        new_bags = item.get('items_available', 0) > 0
-        name = item.get('display_name')
-        #commented out to avoid duplicates
-        #new_favorite = Favorite(name=name, new_bags=new_bags, subscriber_id=credential.subscriber_id)
-        # db.session.add(new_favorite)
-        # db.session.commit()
-
+@app.route('/favorites')
+def get_favorites():
     favorites = Favorite.query.all()
     return '\n'.join([f"{favorite.id}: {favorite.name}, {favorite.new_bags}, {favorite.subscriber_id}" for favorite in favorites])
     
@@ -74,5 +58,15 @@ def submit_subscriber_info():
 
     db.session.add(credential)
     db.session.commit()
+
+    client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
+    items = client.get_items()
+
+    for item in items:
+        new_bags = item.get('items_available', 0) > 0
+        name = item.get('display_name')
+        new_favorite = Favorite(name=name, new_bags=new_bags, subscriber_id=credential.subscriber_id)
+        db.session.add(new_favorite)
+        db.session.commit()
 
     return jsonify({'message': 'Subscriber information added successfully'})
