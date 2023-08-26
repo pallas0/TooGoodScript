@@ -30,8 +30,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-
-
+@app.route('/twilio_check')
+def twilio_check():
+    message = client.messages.create(
+                                body="this is working!",
+                                from_=twilio_phone_number,
+                                to="4076339712"
+                            )
+    
+    return 'yay!'
 @app.route('/check_new_bags')
 def check_bags():
     subscribers = Subscriber.query.all()
