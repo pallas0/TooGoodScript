@@ -5,8 +5,6 @@ Login / Subscribe Page
     - we should show a confirmation message if the email
   is indeed a too good to go account, if not  
 
-
-
 """
 import os
 
@@ -15,16 +13,23 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from tgtg import TgtgClient
+from twilio.rest import Client
 
 from models import Credential, db, Favorite, Subscriber
 
 DATABASE_URI = os.environ.get("DATABASE_URI")
+twilio_account_sid = os.environ.get("twilio_account_sid")
+twilio_auth_token = os.environ.get("twilio_auth_token")
+twilio_phone_number = os.environ.get("twilio_phone_number")
+
+client = Client(twilio_account_sid, twilio_auth_token)
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+
 
 
 @app.route('/check_new_bags')
