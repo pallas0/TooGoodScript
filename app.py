@@ -17,6 +17,7 @@ from twilio.rest import Client
 
 from models import Credential, db, Favorite, Subscriber
 
+SECRET_KEY = os.environ.get("SECRET_KEY")
 DATABASE_URI = os.environ.get("DATABASE_URI")
 twilio_account_sid = os.environ.get("twilio_account_sid")
 twilio_auth_token = os.environ.get("twilio_auth_token")
@@ -25,6 +26,7 @@ twilio_phone_number = os.environ.get("twilio_phone_number")
 twilio_client = Client(twilio_account_sid, twilio_auth_token)
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
 db.init_app(app)
