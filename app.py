@@ -30,30 +30,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-@app.route('/twilio_check')
-def twilio_check():
-    message = twilio_client.messages.create(
-                                body="this is working!",
-                                from_=twilio_phone_number,
-                                to="4076339712"
-                            )
-    
-    return 'yay!'
+
 @app.route('/check_if_favorites_available')
 def check_if_favorites_available():
-    test_data = [{'display_name': 'Obour Foods (Hummus & Toum)', 'items_available': 10},
-                 {'display_name': "Ha Tea - Chinatown (Fruits)", 'items_available': 1},
-                 {'display_name': 'Gracias Madre (Surprise Bag)', 'items_available': 0},
-                 {'display_name': 'Mission Minis', 'items_available': 0}]
     subscribers = Subscriber.query.all()
     for subscriber in subscribers:
         credentials = subscriber.credential
         if credentials:
             credential = credentials[0]
             client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
-            #altering to test
-            #items = client.get_items()
-            items = test_data
+            items = client.get_items()
             for item in items:
                 item_name = item.get('display_name')
                 item_available = item.get('items_available', 0) > 0
@@ -70,7 +56,7 @@ def check_if_favorites_available():
                     if favorite.new_bags != item_available:
                         favorite.new_bags = item_available
                         db.session.commit()
-    return 'yay'
+    return 'check_if_favorites_available method working'
 
     
 
@@ -100,7 +86,6 @@ def submit_subscriber_info():
     db.session.add(new_subscriber)
     db.session.commit()
 
-    email = new_subscriber.email
     client = TgtgClient(email=email)
     #stalls here until credentials are returned (requires user approval via app or email)
     credentials_data = client.get_credentials()
@@ -114,7 +99,6 @@ def submit_subscriber_info():
     )
 
     db.session.add(credential)
-    db.session.commit()
 
     client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
     items = client.get_items()
