@@ -22,7 +22,7 @@ twilio_account_sid = os.environ.get("twilio_account_sid")
 twilio_auth_token = os.environ.get("twilio_auth_token")
 twilio_phone_number = os.environ.get("twilio_phone_number")
 
-client = Client(twilio_account_sid, twilio_auth_token)
+twilio_client = Client(twilio_account_sid, twilio_auth_token)
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
@@ -32,22 +32,28 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 @app.route('/twilio_check')
 def twilio_check():
-    message = client.messages.create(
+    message = twilio_client.messages.create(
                                 body="this is working!",
                                 from_=twilio_phone_number,
                                 to="4076339712"
                             )
     
     return 'yay!'
-@app.route('/check_new_bags')
-def check_bags():
+@app.route('/check_if_favorites_available')
+def check_if_favorites_available():
+    test_data = [{'display_name': 'Obour Foods (Hummus & Toum)', 'items_available': 10},
+                 {'display_name': "Ha Tea - Chinatown (Fruits)", 'items_available': 1},
+                 {'display_name': 'Gracias Madre (Surprise Bag)', 'items_available': 0},
+                 {'display_name': 'Mission Minis', 'items_available': 0}]
     subscribers = Subscriber.query.all()
     for subscriber in subscribers:
         credentials = subscriber.credential
         if credentials:
             credential = credentials[0]
             client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
-            items = client.get_items()
+            #altering to test
+            #items = client.get_items()
+            items = test_data
             for item in items:
                 item_name = item.get('display_name')
                 item_available = item.get('items_available', 0) > 0
@@ -55,6 +61,12 @@ def check_bags():
                 favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()
             
                 if favorite:
+                    if not favorite.new_bags and item_available:
+                        message = twilio_client.messages.create(
+                            body=f"Your favorited store, '{item_name}', now has bags available!",
+                            from_=twilio_phone_number,
+                            to=subscriber.phone_number
+                        )
                     if favorite.new_bags != item_available:
                         favorite.new_bags = item_available
                         db.session.commit()
