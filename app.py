@@ -33,6 +33,8 @@ db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 
+
+
 @app.route('/check_if_favorites_available')
 def check_if_favorites_available():
     subscribers = Subscriber.query.all()
@@ -82,7 +84,7 @@ def list_credentials():
 def submit_subscriber_info():
     data = request.json 
     email = data.get('email')
-    phone_number = data.get('phone_number')
+    phone_number = data.get('phoneNumber')
 
     new_subscriber = Subscriber(email=email, phone_number=phone_number)
     db.session.add(new_subscriber)
