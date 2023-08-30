@@ -45,6 +45,9 @@ def get_user_items(subscriber):
 
 @app.route('/favorites/availability')
 def check_if_favorites_available():
+    test_data = [{'display_name': 'Obour Foods (Hummus & Toum)', 'items_available': 0},
+                 {'display_name': "Ha Tea - Chinatown (Fruits)", 'items_available': 0},
+                 {'display_name': 'Mission Minis', 'items_available': 0}]
     subscribers = Subscriber.query.all()
     for subscriber in subscribers:
         #items = get_user_items(subscriber)
@@ -58,7 +61,8 @@ def check_if_favorites_available():
             favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()
         
             if favorite:
-                if not favorite.new_bags and item_available:
+                print(favorite.has_new_bags(item_available))
+                if favorite.has_new_bags(item_available):
                     message = twilio_client.messages.create(
                         body=f"Your favorited store, '{item_name}', now has bags available!",
                         from_=TWILIO_PHONE_NUMBER,
@@ -67,7 +71,7 @@ def check_if_favorites_available():
                 if favorite.new_bags != item_available:
                     favorite.new_bags = item_available
                     db.session.commit()
-    return 'check_if_favorites_available method working'
+    return '200'
 
     
 

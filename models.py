@@ -27,3 +27,7 @@ class Favorite(db.Model):
     new_bags = db.Column(db.Boolean, nullable=False)
     subscriber_id = db.Column(db.Integer, db.ForeignKey('subscriber.id'), nullable=False)
     subscriber = db.relationship('Subscriber', backref='favorites')
+    
+    def has_new_bags(self, item_available):
+        return not self.new_bags and item_available
+
