@@ -72,7 +72,7 @@ def check_if_favorites_available():
                 new_favorite = Favorite.create_new_item(item, subscriber.id)
                 db.session.add(new_favorite)
                 db.session.commit()
-    return '200'
+    return 200
 
     
 
