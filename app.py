@@ -71,6 +71,13 @@ def check_if_favorites_available():
                 if favorite.new_bags != item_available:
                     favorite.new_bags = item_available
                     db.session.commit()
+            
+            #else:
+                # new_bags = item.get('items_available', 0) > 0
+                # name = item.get('display_name')
+                # new_favorite = Favorite(name=name, new_bags=new_bags, subscriber_id=credential.subscriber_id)
+                # db.session.add(new_favorite)
+                # db.session.commit()
     return '200'
 
     
@@ -78,18 +85,18 @@ def check_if_favorites_available():
 @app.route('/favorites')
 def get_favorites():
     favorites = Favorite.query.all()
-    return '\n'.join([f"{favorite.id}: {favorite.name}, {favorite.new_bags}, {favorite.subscriber_id}" for favorite in favorites])
+    return '\n'.join([f"{favorite.id}: {favorite.name}, {favorite.new_bags}, {favorite.subscriber_id}" for favorite in favorites]), 200
     
 
 @app.route('/subscribers')
 def list_subscribers():
     subscribers = Subscriber.query.all()
-    return '\n'.join([f"{subscriber.id}: {subscriber.email}, {subscriber.phone_number}" for subscriber in subscribers])
+    return '\n'.join([f"{subscriber.id}: {subscriber.email}, {subscriber.phone_number}" for subscriber in subscribers]), 200
 
 @app.route('/credentials')
 def list_credentials():
     credentials = Credential.query.all()
-    return '\n'.join([f"{credential.id}: {credential.access_token}, {credential.refresh_token}, {credential.user_id}, {credential.cookie}, {credential.subscriber_id}" for credential in credentials])
+    return '\n'.join([f"{credential.id}: {credential.access_token}, {credential.refresh_token}, {credential.user_id}, {credential.cookie}, {credential.subscriber_id}" for credential in credentials]), 200
 
 @app.route('/submit_subscriber_info', methods=['POST'])
 def submit_subscriber_info():

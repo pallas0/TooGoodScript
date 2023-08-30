@@ -30,4 +30,14 @@ class Favorite(db.Model):
     
     def has_new_bags(self, item_available):
         return not self.new_bags and item_available
+    
+    
+    @classmethod
+    def create_from_item_and_subscriberid(cls, item, subscriber_id, db_session):
+        new_bags = item.get('items_available', 0) > 0
+        name = item.get('display_name')
+        new_favorite = cls(name=name, new_bags=new_bags, subscriber_id=subscriber_id)
+        db_session.add(new_favorite)
+        db_session.commit()
+
 
