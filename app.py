@@ -56,6 +56,7 @@ def get_user_items(subscriber):
 def check_if_favorites_available():
     test_data = [{'display_name': 'Obour Foods (Hummus & Toum)', 'items_available': 0},
                  {'display_name': "Ha Tea - Chinatown (Fruits)", 'items_available': 0},
+                 {'display_name': "Gracias Madre", 'items_available': 0},
                  {'display_name': 'Mission Minis', 'items_available': 0}]
     subscribers = Subscriber.query.all()
     for subscriber in subscribers:
@@ -70,7 +71,6 @@ def check_if_favorites_available():
             favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()
         
             if favorite:
-                print(favorite.has_new_bags(item_available))
                 if favorite.has_new_bags(item_available):
                     message = twilio_client.messages.create(
                         body=f"Your favorited store, '{item_name}', now has bags available!",
@@ -81,12 +81,10 @@ def check_if_favorites_available():
                     favorite.new_bags = item_available
                     db.session.commit()
             
-            #else:
-                # new_bags = item.get('items_available', 0) > 0
-                # name = item.get('display_name')
-                # new_favorite = Favorite(name=name, new_bags=new_bags, subscriber_id=credential.subscriber_id)
-                # db.session.add(new_favorite)
-                # db.session.commit()
+            else:
+                new_favorite = Favorite.create_new_item(item, subscriber.id)
+                db.session.add(new_favorite)
+                db.session.commit()
     return '200'
 
     
