@@ -32,6 +32,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
+# def clear_table(table):
+#     db.session.query(table).delete()
+#     db.session.commit()
+    
+# with app.app_context():
+#     clear_table(Favorite)
+#     clear_table(Credential)
+#     clear_table(Subscriber)
+
 def get_user_items(subscriber):
     try:
         credentials = subscriber.credential
@@ -126,9 +135,7 @@ def submit_subscriber_info():
     items = client.get_items()
 
     for item in items:
-        new_bags = item.get('items_available', 0) > 0
-        name = item.get('display_name')
-        new_favorite = Favorite(name=name, new_bags=new_bags, subscriber_id=credential.subscriber_id)
+        new_favorite = Favorite.create_new_item(item, new_subscriber.id)
         db.session.add(new_favorite)
         db.session.commit()
 
