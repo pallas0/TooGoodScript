@@ -19,11 +19,11 @@ from models import Credential, db, Favorite, Subscriber
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DATABASE_URI = os.environ.get("DATABASE_URI")
-twilio_account_sid = os.environ.get("twilio_account_sid")
-twilio_auth_token = os.environ.get("twilio_auth_token")
-twilio_phone_number = os.environ.get("twilio_phone_number")
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
 
-twilio_client = Client(twilio_account_sid, twilio_auth_token)
+twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SECRET_KEY
@@ -32,34 +32,41 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
+def get_user_items(subscriber):
+    try:
+        credentials = subscriber.credential
+        credential = credentials[0]
+        client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
+        items = client.get_items()
+        return items
+    except Exception as e:
+        print(f"Error when attempting to access favorites for user with ID of {subscriber.id}: {e}")
 
 
-
-@app.route('/check_if_favorites_available')
+@app.route('/favorites/availability')
 def check_if_favorites_available():
     subscribers = Subscriber.query.all()
     for subscriber in subscribers:
-        credentials = subscriber.credential
-        if credentials:
-            credential = credentials[0]
-            client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
-            items = client.get_items()
-            for item in items:
-                item_name = item.get('display_name')
-                item_available = item.get('items_available', 0) > 0
+        #items = get_user_items(subscriber)
+        items = test_data
+        if not items:
+            return f"No items found for user {subscriber.id}, 400"
+        for item in items:
+            item_name = item.get('display_name')
+            item_available = item.get('items_available', 0) > 0
             
-                favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()
-            
-                if favorite:
-                    if not favorite.new_bags and item_available:
-                        message = twilio_client.messages.create(
-                            body=f"Your favorited store, '{item_name}', now has bags available!",
-                            from_=twilio_phone_number,
-                            to=subscriber.phone_number
-                        )
-                    if favorite.new_bags != item_available:
-                        favorite.new_bags = item_available
-                        db.session.commit()
+            favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()
+        
+            if favorite:
+                if not favorite.new_bags and item_available:
+                    message = twilio_client.messages.create(
+                        body=f"Your favorited store, '{item_name}', now has bags available!",
+                        from_=TWILIO_PHONE_NUMBER,
+                        to=subscriber.phone_number
+                    )
+                if favorite.new_bags != item_available:
+                    favorite.new_bags = item_available
+                    db.session.commit()
     return 'check_if_favorites_available method working'
 
     
