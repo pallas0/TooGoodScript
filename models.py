@@ -27,3 +27,16 @@ class Favorite(db.Model):
     new_bags = db.Column(db.Boolean, nullable=False)
     subscriber_id = db.Column(db.Integer, db.ForeignKey('subscriber.id'), nullable=False)
     subscriber = db.relationship('Subscriber', backref='favorites')
+    
+    def has_new_bags(self, item_available):
+        return not self.new_bags and item_available
+    
+    
+    @classmethod
+    def create_new_item(cls, item, subscriber_id):
+        new_bags = item.get('items_available', 0) > 0
+        name = item.get('display_name')
+        new_favorite = cls(name=name, new_bags=new_bags, subscriber_id=subscriber_id)
+        return new_favorite
+
+
