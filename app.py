@@ -33,15 +33,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-# def clear_table(table):
-#     db.session.query(table).delete()
-#     db.session.commit()
-    
-# with app.app_context():
-#     clear_table(Favorite)
-#     clear_table(Credential)
-#     clear_table(Subscriber)
-
 
 def get_user_items(subscriber):
     try:
@@ -52,20 +43,6 @@ def get_user_items(subscriber):
         return items
     except Exception as e:
         print(f"Error when attempting to access favorites for user with ID of {subscriber.id}: {e}")
-
-def get_credentials_with_timeout(email):
-    credentials_data = [None]
-
-    def get_credentials_thread():
-        nonlocal credentials_data
-        client = TgtgClient(email=email)
-        credentials_data[0] = client.get_credentials()
-
-    thread = threading.Thread(target=get_credentials_thread)
-    thread.start()
-    thread.join(timeout=115)
-
-    return credentials_data[0]
 
 
 @app.route('/favorites/availability')
@@ -125,9 +102,9 @@ def submit_subscriber_info():
     new_subscriber = Subscriber(email=email, phone_number=phone_number)
     db.session.add(new_subscriber)
 
-    # client = TgtgClient(email=email)
-    # credentials_data = client.get_credentials()
-    credentials_data = get_credentials_with_timeout(email)
+    credentials_data = None
+    client = TgtgClient(email=email)
+    credentials_data = client.get_credentials()
 
     if credentials_data is None:
         return jsonify({'message': 'Credential retrieval timeout'}), 500
