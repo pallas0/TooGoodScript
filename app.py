@@ -33,6 +33,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
+# def clear_table(table):
+#     db.session.query(table).delete()
+#     db.session.commit()
+    
+# with app.app_context():
+#     clear_table(Favorite)
+#     clear_table(Credential)
+#     clear_table(Subscriber)
 
 def get_user_items(subscriber):
     try:
@@ -47,9 +55,14 @@ def get_user_items(subscriber):
 
 @app.route('/favorites/availability')
 def check_if_favorites_available():
+    test_data = [{'display_name': 'Obour Foods (Hummus & Toum)', 'items_available': 10},
+                 {'display_name': "Ha Tea - Chinatown (Fruits)", 'items_available': 1},
+                 {'display_name': 'Gracias Madre (Surprise Bag)', 'items_available': 0},
+                 {'display_name': 'Mission Minis', 'items_available': 0}]
     subscribers = Subscriber.query.all()
     for subscriber in subscribers:
-        items = get_user_items(subscriber)
+        #items = get_user_items(subscriber)
+        items = test_data
         if not items:
             return f"No items found for user {subscriber.id}, 400"
         for item in items:
@@ -73,7 +86,7 @@ def check_if_favorites_available():
                 new_favorite = Favorite.create_new_item(item, subscriber.id)
                 db.session.add(new_favorite)
                 db.session.commit()
-    return 200
+    return 'no'
 
     
 
