@@ -16,7 +16,6 @@ click-didyoumean==0.3.0
 click-plugins==1.1.1
 click-repl==0.3.0
 distlib==0.3.7
-Django==4.2.4
 filelock==3.12.2
 Flask==2.3.2
 Flask-Cors==4.0.0
