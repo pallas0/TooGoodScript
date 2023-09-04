@@ -29,19 +29,10 @@ twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
-#app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
 
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-# def clear_table(table):
-#     db.session.query(table).delete()
-#     db.session.commit()
-    
-# with app.app_context():
-#     clear_table(Favorite)
-#     clear_table(Credential)
-#     clear_table(Subscriber)
 
 def get_user_items(subscriber):
     try:
