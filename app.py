@@ -7,7 +7,6 @@ Login / Subscribe Page
 
 """
 import os
-import threading
 
 from flask import Flask, jsonify, request
 from flask_apscheduler import APScheduler
