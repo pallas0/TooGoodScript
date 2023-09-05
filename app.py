@@ -44,14 +44,9 @@ def get_user_items(subscriber):
 
 def check_if_favorites_available():
     with app.app_context():
-        test_data = [{'display_name': 'Obour Foods (Hummus & Toum)', 'items_available': 10},
-                 {'display_name': "Ha Tea - Chinatown (Fruits)", 'items_available': 0},
-                 {'display_name': 'Gracias Madre (Surprise Bag)', 'items_available': 0},
-                 {'display_name': 'Mission Minis', 'items_available': 0}]
         subscribers = Subscriber.query.all()
         for subscriber in subscribers:
-            #items = get_user_items(subscriber)
-            items = test_data
+            items = get_user_items(subscriber)
             if not items:
                 return f"No items found for user {subscriber.id}, 400"
             for item in items:
