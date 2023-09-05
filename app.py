@@ -26,8 +26,8 @@ app.config["SECRET_KEY"] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
 db.init_app(app)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
+CORS(app, origins=["https://too-good-frontend.vercel.app"])
 scheduler = BackgroundScheduler()
 
 
