@@ -1,11 +1,3 @@
-"""
-Login / Subscribe Page
-- user inputs phone number + email 
-- validations
-    - we should show a confirmation message if the email
-  is indeed a too good to go account, if not  
-
-"""
 import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -50,7 +42,6 @@ def get_user_items(subscriber):
         print(f"Error when attempting to access favorites for user with ID of {subscriber.id}: {e}")
 
 
-#@app.route('/favorites/availability')
 def check_if_favorites_available():
     with app.app_context():
         subscribers = Subscriber.query.all()
@@ -79,7 +70,6 @@ def check_if_favorites_available():
                     new_favorite = Favorite.create_new_item(item, subscriber.id)
                     db.session.add(new_favorite)
                     db.session.commit()
-        #return 200
         pass
 
 scheduler.add_job(
