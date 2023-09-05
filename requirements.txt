@@ -9,6 +9,7 @@ async-timeout==4.0.2
 attrs==23.1.0
 billiard==4.1.0
 blinker==1.6.2
+celery==5.3.1
 certifi==2023.7.22
 charset-normalizer==3.2.0
 click==8.1.6
@@ -16,10 +17,13 @@ click-didyoumean==0.3.0
 click-plugins==1.1.1
 click-repl==0.3.0
 distlib==0.3.7
+Django==4.2.4
 filelock==3.12.2
 Flask==2.3.2
+Flask-APScheduler==1.12.4
 Flask-Cors==4.0.0
 Flask-Migrate==4.0.4
+Flask-Script==2.0.6
 Flask-SQLAlchemy==3.0.5
 frozenlist==1.4.0
 gunicorn==21.2.0
