@@ -8,11 +8,14 @@ Login / Subscribe Page
 """
 import os
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, request
 from flask_apscheduler import APScheduler
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from pytz import timezone
 from tgtg import TgtgClient
 from twilio.rest import Client
 
@@ -33,6 +36,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
+scheduler = BackgroundScheduler()
+
 
 def get_user_items(subscriber):
     try:
@@ -45,11 +50,16 @@ def get_user_items(subscriber):
         print(f"Error when attempting to access favorites for user with ID of {subscriber.id}: {e}")
 
 
-@app.route('/favorites/availability')
+#@app.route('/favorites/availability')
 def check_if_favorites_available():
+    test_data = [{'display_name': 'Obour Foods (Hummus & Toum)', 'items_available': 10},
+                 {'display_name': "Ha Tea - Chinatown (Fruits)", 'items_available': 1},
+                 {'display_name': 'Gracias Madre (Surprise Bag)', 'items_available': 0},
+                 {'display_name': 'Mission Minis', 'items_available': 0}]
     subscribers = Subscriber.query.all()
     for subscriber in subscribers:
-        items = get_user_items(subscriber)
+        #items = get_user_items(subscriber)
+        items = test_data
         if not items:
             return f"No items found for user {subscriber.id}, 400"
         for item in items:
@@ -73,8 +83,16 @@ def check_if_favorites_available():
                 new_favorite = Favorite.create_new_item(item, subscriber.id)
                 db.session.add(new_favorite)
                 db.session.commit()
-    return 'no'
+    #return 200
+    pass
 
+scheduler.add_job(
+    check_if_favorites_available,
+    CronTrigger(hour='19', minute='40', timezone=timezone('US/Pacific')),
+    id='check_favorites_job_710pm',
+)
+
+scheduler.start()
     
 
 @app.route('/favorites')
