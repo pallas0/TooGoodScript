@@ -53,14 +53,9 @@ def get_user_items(subscriber):
 #@app.route('/favorites/availability')
 def check_if_favorites_available():
     with app.app_context():
-        test_data = [{'display_name': 'Obour Foods (Hummus & Toum)', 'items_available': 10},
-                    {'display_name': "Ha Tea - Chinatown (Fruits)", 'items_available': 1},
-                    {'display_name': 'Gracias Madre (Surprise Bag)', 'items_available': 0},
-                    {'display_name': 'Mission Minis', 'items_available': 0}]
         subscribers = Subscriber.query.all()
         for subscriber in subscribers:
-            #items = get_user_items(subscriber)
-            items = test_data
+            items = get_user_items(subscriber)
             if not items:
                 return f"No items found for user {subscriber.id}, 400"
             for item in items:
@@ -89,8 +84,8 @@ def check_if_favorites_available():
 
 scheduler.add_job(
     check_if_favorites_available,
-    CronTrigger(hour='19', minute='59', timezone=timezone('US/Pacific')),
-    id='check_favorites_job_710pm',
+    CronTrigger(hour='8-22', minute='0', second='0', timezone=timezone('US/Pacific')),
+    id='check_favorites_job',
 )
 
 scheduler.start()
