@@ -75,7 +75,7 @@ def check_if_favorites_available():
 
 scheduler.add_job(
     check_if_favorites_available,
-    CronTrigger(hour='8-22', minute='0', second='0', timezone=timezone('US/Pacific')),
+    CronTrigger(hour='8-21', minute='*/30', second='0', timezone=timezone('US/Pacific')),
     id='check_favorites_job',
 )
 
