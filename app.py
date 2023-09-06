@@ -2,6 +2,7 @@ import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+import asyncio
 from flask import Flask, jsonify, request
 from flask_apscheduler import APScheduler
 from flask_cors import CORS
@@ -27,9 +28,19 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
 db.init_app(app)
 
-CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}})
+#CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 scheduler = BackgroundScheduler()
+
+# def clear_table(table):
+#     db.session.query(table).delete()
+#     db.session.commit()
+    
+# with app.app_context():
+#     clear_table(Favorite)
+#     clear_table(Credential)
+#     clear_table(Subscriber)
 
 
 def get_user_items(subscriber):
@@ -105,33 +116,46 @@ def submit_subscriber_info():
     email = data.get('email')
     phone_number = data.get('phoneNumber')
 
-    new_subscriber = Subscriber(email=email, phone_number=phone_number)
-    db.session.add(new_subscriber)
-
-    credentials_data = None
-    client = TgtgClient(email=email)
-    credentials_data = client.get_credentials()
-
-    if credentials_data is None:
-        return jsonify({'message': 'Credential retrieval timeout'}), 500
-    
-    db.session.commit()
-    credential = Credential(
-        access_token=credentials_data['access_token'],
-        refresh_token=credentials_data['refresh_token'],
-        user_id=credentials_data['user_id'],
-        cookie=credentials_data['cookie'],
-        subscriber_id=new_subscriber.id  
-    )
-
-    db.session.add(credential)
-
-    client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
-    items = client.get_items()
-
-    for item in items:
-        new_favorite = Favorite.create_new_item(item, new_subscriber.id)
-        db.session.add(new_favorite)
+    try:
+        new_subscriber = Subscriber(email=email, phone_number=phone_number)
+        db.session.add(new_subscriber)
         db.session.commit()
 
-    return jsonify({'message': 'Subscriber information added successfully'}), 201
+        if new_subscriber.id:
+            #async func call goes here
+            return jsonify({'message': 'Subscriber added', 'subscriber_id': new_subscriber.id})
+    except Exception as e:
+        return jsonify({'message': f'Error: {(e)}'}), 500
+
+    # credentials_data = None
+
+    # try:
+    #     client = TgtgClient(email=email)
+    #     credentials_data = client.get_credentials()
+    # except Exception as e:
+    #     print(e)
+    #     return jsonify({'message': 'Credential retrieval timeout'}), 400
+
+    # if credentials_data is None:
+    #     return jsonify({'message': 'Credential retrieval timeout'}), 500
+    
+    # db.session.commit()
+    # credential = Credential(
+    #     access_token=credentials_data['access_token'],
+    #     refresh_token=credentials_data['refresh_token'],
+    #     user_id=credentials_data['user_id'],
+    #     cookie=credentials_data['cookie'],
+    #     subscriber_id=new_subscriber.id  
+    # )
+
+    # db.session.add(credential)
+
+    # client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
+    # items = client.get_items()
+
+    # for item in items:
+    #     new_favorite = Favorite.create_new_item(item, new_subscriber.id)
+    #     db.session.add(new_favorite)
+    #     db.session.commit()
+
+    # return jsonify({'message': 'Subscriber information added successfully'}), 201
