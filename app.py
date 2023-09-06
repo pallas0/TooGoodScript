@@ -27,7 +27,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
 db.init_app(app)
 
-CORS(app, origins=["https://too-good-frontend.vercel.app"])
+CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}})
+
 scheduler = BackgroundScheduler()
 
 
