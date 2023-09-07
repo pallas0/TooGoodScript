@@ -143,6 +143,11 @@ def process_subscriber(subscriber_id):
 
     client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
     items = client.get_items()
+    message = twilio_client.messages.create(
+                            body="You're all set to start receiving notifications when your favorite TGTG batches are released!",
+                            from_=TWILIO_PHONE_NUMBER,
+                            to=new_subscriber.phone_number
+                        )
 
     for item in items:
         new_favorite = Favorite.create_new_item(item, new_subscriber.id)
