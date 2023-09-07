@@ -2,13 +2,16 @@ import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+import asyncio
 from flask import Flask, jsonify, request
 from flask_apscheduler import APScheduler
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from pytz import timezone
+from tgtg.exceptions import TgtgPollingError, TgtgLoginError, TgtgAPIError
 from tgtg import TgtgClient
+
 from twilio.rest import Client
 
 from models import Credential, db, Favorite, Subscriber
@@ -28,6 +31,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 
 CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}})
+
 
 scheduler = BackgroundScheduler()
 
@@ -105,17 +109,28 @@ def submit_subscriber_info():
     email = data.get('email')
     phone_number = data.get('phoneNumber')
 
-    new_subscriber = Subscriber(email=email, phone_number=phone_number)
-    db.session.add(new_subscriber)
+    try:
+        new_subscriber = Subscriber(email=email, phone_number=phone_number)
+        db.session.add(new_subscriber)
+        db.session.commit()
 
-    credentials_data = None
-    client = TgtgClient(email=email)
-    credentials_data = client.get_credentials()
+        if new_subscriber.id:
+            return jsonify({'message': 'Subscriber added', 'subscriber_id': new_subscriber.id, 'status': 201})
+    except Exception as e:
+        print(e)
+        return jsonify({'message': f'Error: {(e)}', 'status': 500})
 
-    if credentials_data is None:
-        return jsonify({'message': 'Credential retrieval timeout'}), 500
+@app.route('/process_subscriber/<int:subscriber_id>')
+def process_subscriber(subscriber_id):
+    new_subscriber = Subscriber.query.get(subscriber_id)
+    try:
+        client = TgtgClient(email=new_subscriber.email)
+        credentials_data = client.get_credentials()
+    except (TgtgLoginError, TgtgAPIError, TgtgPollingError, Exception) as e:
+        db.session.delete(new_subscriber)
+        db.session.commit()
+        return jsonify({'message': str(e), 'status': 500})
     
-    db.session.commit()
     credential = Credential(
         access_token=credentials_data['access_token'],
         refresh_token=credentials_data['refresh_token'],
@@ -123,8 +138,8 @@ def submit_subscriber_info():
         cookie=credentials_data['cookie'],
         subscriber_id=new_subscriber.id  
     )
-
     db.session.add(credential)
+    db.session.commit()
 
     client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
     items = client.get_items()
@@ -134,4 +149,4 @@ def submit_subscriber_info():
         db.session.add(new_favorite)
         db.session.commit()
 
-    return jsonify({'message': 'Subscriber information added successfully'}), 201
+    return jsonify({'message': 'Subscriber information added successfully', 'status': 201})
