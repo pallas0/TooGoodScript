@@ -133,10 +133,10 @@ def process_subscriber(subscriber_id):
         client = TgtgClient(email=new_subscriber.email)
         credentials_data = client.get_credentials()
     except Exception as e:
-        print(e)
+        print(str(e))
         db.session.delete(new_subscriber)
         db.session.commit()
-        return jsonify({'message': 'Credential retrieval timeout.  Resubmit your info to try again.', 'status': 400})
+        return jsonify({'message': str(e), 'status': 500})
     
     credential = Credential(
         access_token=credentials_data['access_token'],
@@ -145,20 +145,15 @@ def process_subscriber(subscriber_id):
         cookie=credentials_data['cookie'],
         subscriber_id=new_subscriber.id  
     )
-
     db.session.add(credential)
     db.session.commit()
 
-    #set up next try/exception w above db session methods
-    #if successful, setup text sent through twilio + instantiation of favorites
+    client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
+    items = client.get_items()
 
-    # client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
-    # items = client.get_items()
-    # #test case -> subscriber doesn't have any favorites
+    for item in items:
+        new_favorite = Favorite.create_new_item(item, new_subscriber.id)
+        db.session.add(new_favorite)
+        db.session.commit()
 
-    # for item in items:
-    #     new_favorite = Favorite.create_new_item(item, new_subscriber.id)
-    #     db.session.add(new_favorite)
-    #     db.session.commit()
-
-    return jsonify({'message': 'Subscriber information added successfully'}), 201
+    return jsonify({'message': 'Subscriber information added successfully', 'status': 201})
