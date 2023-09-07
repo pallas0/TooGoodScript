@@ -9,7 +9,9 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from pytz import timezone
+from tgtg.exceptions import TgtgPollingError, TgtgLoginError, TgtgAPIError
 from tgtg import TgtgClient
+
 from twilio.rest import Client
 
 from models import Credential, db, Favorite, Subscriber
@@ -28,19 +30,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
 db.init_app(app)
 
-#CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}})
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}})
+
 
 scheduler = BackgroundScheduler()
-
-# def clear_table(table):
-#     db.session.query(table).delete()
-#     db.session.commit()
-    
-# with app.app_context():
-#     clear_table(Favorite)
-#     clear_table(Credential)
-#     clear_table(Subscriber)
 
 
 def get_user_items(subscriber):
@@ -124,6 +117,7 @@ def submit_subscriber_info():
         if new_subscriber.id:
             return jsonify({'message': 'Subscriber added', 'subscriber_id': new_subscriber.id, 'status': 201})
     except Exception as e:
+        print(e)
         return jsonify({'message': f'Error: {(e)}', 'status': 500})
 
 @app.route('/process_subscriber/<int:subscriber_id>')
@@ -132,8 +126,7 @@ def process_subscriber(subscriber_id):
     try:
         client = TgtgClient(email=new_subscriber.email)
         credentials_data = client.get_credentials()
-    except Exception as e:
-        print(str(e))
+    except (TgtgLoginError, TgtgAPIError, TgtgPollingError, Exception) as e:
         db.session.delete(new_subscriber)
         db.session.commit()
         return jsonify({'message': str(e), 'status': 500})
