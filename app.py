@@ -122,40 +122,43 @@ def submit_subscriber_info():
         db.session.commit()
 
         if new_subscriber.id:
-            #async func call goes here
             return jsonify({'message': 'Subscriber added', 'subscriber_id': new_subscriber.id, 'status': 201})
     except Exception as e:
         return jsonify({'message': f'Error: {(e)}', 'status': 500})
 
-    # credentials_data = None
-
-    # try:
-    #     client = TgtgClient(email=email)
-    #     credentials_data = client.get_credentials()
-    # except Exception as e:
-    #     print(e)
-    #     return jsonify({'message': 'Credential retrieval timeout'}), 400
-
-    # if credentials_data is None:
-    #     return jsonify({'message': 'Credential retrieval timeout'}), 500
+@app.route('/process_subscriber/<int:subscriber_id>')
+def process_subscriber(subscriber_id):
+    new_subscriber = Subscriber.query.get(subscriber_id)
+    try:
+        client = TgtgClient(email=new_subscriber.email)
+        credentials_data = client.get_credentials()
+    except Exception as e:
+        print(e)
+        db.session.delete(new_subscriber)
+        db.session.commit()
+        return jsonify({'message': 'Credential retrieval timeout.  Resubmit your info to try again.', 'status': 400})
     
-    # db.session.commit()
-    # credential = Credential(
-    #     access_token=credentials_data['access_token'],
-    #     refresh_token=credentials_data['refresh_token'],
-    #     user_id=credentials_data['user_id'],
-    #     cookie=credentials_data['cookie'],
-    #     subscriber_id=new_subscriber.id  
-    # )
+    credential = Credential(
+        access_token=credentials_data['access_token'],
+        refresh_token=credentials_data['refresh_token'],
+        user_id=credentials_data['user_id'],
+        cookie=credentials_data['cookie'],
+        subscriber_id=new_subscriber.id  
+    )
 
-    # db.session.add(credential)
+    db.session.add(credential)
+    db.session.commit()
+
+    #set up next try/exception w above db session methods
+    #if successful, setup text sent through twilio + instantiation of favorites
 
     # client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
     # items = client.get_items()
+    # #test case -> subscriber doesn't have any favorites
 
     # for item in items:
     #     new_favorite = Favorite.create_new_item(item, new_subscriber.id)
     #     db.session.add(new_favorite)
     #     db.session.commit()
 
-    # return jsonify({'message': 'Subscriber information added successfully'}), 201
+    return jsonify({'message': 'Subscriber information added successfully'}), 201
