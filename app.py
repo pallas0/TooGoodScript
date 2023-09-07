@@ -123,9 +123,9 @@ def submit_subscriber_info():
 
         if new_subscriber.id:
             #async func call goes here
-            return jsonify({'message': 'Subscriber added', 'subscriber_id': new_subscriber.id})
+            return jsonify({'message': 'Subscriber added', 'subscriber_id': new_subscriber.id, 'status': 201})
     except Exception as e:
-        return jsonify({'message': f'Error: {(e)}'}), 500
+        return jsonify({'message': f'Error: {(e)}', 'status': 500})
 
     # credentials_data = None
 
