@@ -2,7 +2,6 @@ import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-import asyncio
 from flask import Flask, jsonify, request
 from flask_apscheduler import APScheduler
 from flask_cors import CORS
@@ -11,8 +10,9 @@ from flask_sqlalchemy import SQLAlchemy
 from pytz import timezone
 from tgtg.exceptions import TgtgPollingError, TgtgLoginError, TgtgAPIError
 from tgtg import TgtgClient
-
+from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
+
 
 from models import Credential, db, Favorite, Subscriber
 
@@ -47,17 +47,22 @@ def get_user_items(subscriber):
         print(f"Error when attempting to access favorites for user with ID of {subscriber.id}: {e}")
 
 
+
 def check_if_favorites_available():
     with app.app_context():
         subscribers = Subscriber.query.all()
         for subscriber in subscribers:
+
             items = get_user_items(subscriber)
             if not items:
                 return f"No items found for user {subscriber.id}, 400"
+            
+            # item 1 = thorough bread = one of the favorite stores
             for item in items:
                 item_name = item.get('display_name')
                 item_available = item.get('items_available', 0) > 0
                 
+                # previously existing status of this favorite store
                 favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()
             
                 if favorite:
@@ -102,6 +107,22 @@ def list_subscribers():
 def list_credentials():
     credentials = Credential.query.all()
     return '\n'.join([f"{credential.id}: {credential.access_token}, {credential.refresh_token}, {credential.user_id}, {credential.cookie}, {credential.subscriber_id}" for credential in credentials]), 200
+
+@app.route('/sms', methods=['POST'])
+def process_incoming_sms():
+    sender = request.form['From']
+    message_body = request.form['Body']
+
+    response = MessagingResponse()
+
+    if message_body.strip().lower() in ['stop', 'unsubscribe']:
+        #update_notification_preferences(sender, 'unsubscribe)
+        response.message('You have been unsubscribed from notifications.  Submit your info through the website, https://too-good-frontend.vercel.app/,  if you wish to start receiving notifications again.')
+
+    else:
+        response.message('Message content not recognized.  Text "stop" or "unsubscribe" to stop receiving notifications.')
+    
+    return str(response)
 
 @app.route('/submit_subscriber_info', methods=['POST'])
 def submit_subscriber_info():
