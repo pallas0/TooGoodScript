@@ -116,7 +116,8 @@ def process_incoming_sms():
     response = MessagingResponse()
 
     if message_body.strip().lower() in ['stop', 'unsubscribe']:
-        #update_notification_preferences(sender, 'unsubscribe)
+        #this part not even needed bc network will block us
+        #will change if needed after number verification
         response.message('You have been unsubscribed from notifications.  Submit your info through the website, https://too-good-frontend.vercel.app/,  if you wish to start receiving notifications again.')
 
     else:
