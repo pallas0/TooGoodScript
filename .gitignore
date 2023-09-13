@@ -5,3 +5,4 @@ __pycache__
 .vscode
 code_scrap.py
 api_return_nightmare.py
+/env
