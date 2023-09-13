@@ -37,7 +37,9 @@ The Too Good To Go SMS Alerts backend is responsible for populating and managing
 2. **API Endpoints:**
    
    * /submit_subscriber_info: POST request to submit user information and start receiving SMS alerts.
-
+   * /favorites: GET request to return all favorites in database
+   * /subscribers: GET request to return all subscribers in database
+   * /credentials: GET request to return all credentials in database
    * /sms: Webhook for processing incoming SMS messages, including opt-out requests.
 
    * Customize and expand the endpoints based on your application's requirements.
@@ -45,6 +47,8 @@ The Too Good To Go SMS Alerts backend is responsible for populating and managing
 ## Database Design
 
 The Too Good To Go SMS Alerts backend utilizes a relational database to store user and store information. The database consists of three main tables:
+
+<img width="1173" alt="Screenshot 2023-09-13 at 12 50 51 PM" src="https://github.com/pallas0/TooGoodScript/assets/52135849/6fc48467-96e0-42f6-bf02-59b67ae7cd99">
 
 1. **Subscriber Table:**
 
@@ -83,5 +87,9 @@ This relational database design allows for efficient storage and retrieval of su
 
 
 ## Screenshots
+<img width="1438" alt="Screenshot 2023-09-13 at 12 44 24 PM" src="https://github.com/pallas0/TooGoodScript/assets/52135849/209ca81c-02ee-43bb-8469-08e4939a6b89">
+
+![IMG_7084](https://github.com/pallas0/TooGoodScript/assets/52135849/2cd832b6-bf76-47c7-a4c3-1535d0b98792)
+
 
   
