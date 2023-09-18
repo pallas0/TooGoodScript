@@ -1,5 +1,6 @@
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from tgtg import TgtgClient
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -9,6 +10,16 @@ class Subscriber(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
+
+    def get_user_items(self):
+        try:
+            credentials = self.credential
+            credential = credentials[0]
+            client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
+            items = client.get_items()
+            return items
+        except Exception as e:
+            print(f"Error when attempting to access favorites for user with ID of {subscriber.id}: {e}")
 
 class Credential(db.Model):
     __tablename__ = 'credential'
