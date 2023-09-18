@@ -35,32 +35,23 @@ CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}}
 
 scheduler = BackgroundScheduler()
 
-
-def get_user_items(subscriber):
-    try:
-        credentials = subscriber.credential
-        credential = credentials[0]
-        client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
-        items = client.get_items()
-        return items
-    except Exception as e:
-        print(f"Error when attempting to access favorites for user with ID of {subscriber.id}: {e}")
-
-
-
+#add to utils file
 def check_if_favorites_available():
     with app.app_context():
         subscribers = Subscriber.query.all()
         for subscriber in subscribers:
-            items = get_user_items(subscriber)
+            items = subscriber.get_user_items()
+            
             if not items:
                 return f"No items found for user {subscriber.id}, 400"
             
             # item 1 = thorough bread = one of the favorite stores
             for item in items:
-                item_name = item.get('display_name')
+                if item is None:
+                    continue
+                item_name = item.get('display_name', 0)
                 item_available = item.get('items_available', 0) > 0
-                item_id = int(item.get('item_id'))
+                item_id = int(item.get('item_id', 0))
                 
                 # previously existing status of this favorite store
                 favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()
