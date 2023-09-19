@@ -48,9 +48,10 @@ def check_if_favorites_available(app, db):
             pass
 
 
-def process_items(app, db, item, new_subscriber):
+def process_items(app, db, items, new_subscriber):
     with app.app_context():
-        new_favorite = Favorite.create_new_item(item, new_subscriber.id)
-        db.session.add(new_favorite)
-        db.session.commit()
+        for item in items:
+            new_favorite = Favorite.create_new_item(item, new_subscriber.id)
+            db.session.add(new_favorite)
+            db.session.commit()
     pass
