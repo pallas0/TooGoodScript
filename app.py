@@ -1,4 +1,5 @@
 import os
+from utils import check_if_favorites_available
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -35,49 +36,15 @@ CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}}
 
 scheduler = BackgroundScheduler()
 
-#add to utils file
-def check_if_favorites_available():
-    with app.app_context():
-        subscribers = Subscriber.query.all()
-        for subscriber in subscribers:
-            items = subscriber.get_user_items()
-            
-            if not items:
-                return f"No items found for user {subscriber.id}, 400"
-            
-            # item 1 = thorough bread = one of the favorite stores
-            for item in items:
-                if item is None:
-                    continue
-                item_name = item.get('display_name', 0)
-                item_available = item.get('items_available', 0) > 0
-                item_id = int(item.get('item_id', 0))
-                
-                # previously existing status of this favorite store
-                favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()
-            
-                if favorite:
-                    if favorite.has_new_bags(item_available):
-                        message = twilio_client.messages.create(
-                            body=f"Your favorited store, {item_name}, now has bags available! Click the following link to reserve your bag: https://share.toogoodtogo.com/item/{item_id}",
-                            from_=TWILIO_PHONE_NUMBER,
-                            to=subscriber.phone_number
-                        )
-                    if favorite.new_bags != item_available:
-                        favorite.new_bags = item_available
-                        db.session.commit()
-                
-                else:
-                    new_favorite = Favorite.create_new_item(item, subscriber.id)
-                    db.session.add(new_favorite)
-                    db.session.commit()
-        pass
 
 scheduler.add_job(
     check_if_favorites_available,
-    CronTrigger(hour='8-21', minute='*/30', second='0', timezone=timezone('US/Pacific')),
+    CronTrigger(hour='8-21', minute='*/18', second='0', timezone=timezone('US/Pacific')),
+    args=(app,db),
     id='check_favorites_job',
 )
+
+
 
 
 scheduler.start()
