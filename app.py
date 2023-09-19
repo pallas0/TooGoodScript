@@ -1,5 +1,4 @@
 import os
-from utils import check_if_favorites_available
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -16,6 +15,7 @@ from twilio.rest import Client
 
 
 from models import Credential, db, Favorite, Subscriber
+from utils import check_if_favorites_available, process_items
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DATABASE_URI = os.environ.get("DATABASE_URI")
@@ -124,8 +124,6 @@ def process_subscriber(subscriber_id):
                         )
 
     for item in items:
-        new_favorite = Favorite.create_new_item(item, new_subscriber.id)
-        db.session.add(new_favorite)
-        db.session.commit()
+        process_items(app, db, item, new_subscriber)
 
     return jsonify({'message': 'Subscriber information added successfully', 'status': 201})
