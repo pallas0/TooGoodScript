@@ -33,23 +33,17 @@ db.init_app(app)
 
 CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}})
 
-
 scheduler = BackgroundScheduler()
-
 
 scheduler.add_job(
     check_if_favorites_available,
-    CronTrigger(hour='8-21', minute='*/18', second='0', timezone=timezone('US/Pacific')),
+    CronTrigger(hour='8-21', minute='*/30', second='0', timezone=timezone('US/Pacific')),
     args=(app,db),
     id='check_favorites_job',
 )
 
-
-
-
 scheduler.start()
     
-
 @app.route('/favorites')
 def get_favorites():
     favorites = Favorite.query.all()
