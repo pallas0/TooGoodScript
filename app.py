@@ -31,6 +31,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
 db.init_app(app)
 
+
 CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}})
 
 scheduler = BackgroundScheduler()
@@ -68,8 +69,6 @@ def process_incoming_sms():
     response = MessagingResponse()
 
     if message_body.strip().lower() in ['stop', 'unsubscribe']:
-        #this part not even needed bc network will block us
-        #will change if needed after number verification
         response.message('You have been unsubscribed from notifications.  Submit your info through the website, https://too-good-frontend.vercel.app/,  if you wish to start receiving notifications again.')
 
     else:
@@ -116,14 +115,13 @@ def process_subscriber(subscriber_id):
     db.session.commit()
 
     client = TgtgClient(access_token=credential.access_token, refresh_token=credential.refresh_token, user_id=credential.user_id, cookie=credential.cookie)
-    items = client.get_items()
     message = twilio_client.messages.create(
                             body="You're all set to start receiving notifications when your favorite TGTG batches are released!",
                             from_=TWILIO_PHONE_NUMBER,
                             to=new_subscriber.phone_number
                         )
-
-    for item in items:
-        process_items(app, db, item, new_subscriber)
+    
+    items = client.get_items()
+    process_items(app, db, items, new_subscriber)
 
     return jsonify({'message': 'Subscriber information added successfully', 'status': 201})
