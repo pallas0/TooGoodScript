@@ -23,9 +23,9 @@ def check_if_favorites_available(app, db):
                 for item in items:
                     if item is None:
                         continue
-                    item_name = item.get('display_name', 0)
+                    item_name = item.get('display_name', "N/A")
                     item_available = item.get('items_available', 0) > 0
-                    item_id = int(item.get('item_id', 0))
+                    item_id = item.get('item', {}).get('item_id', 0)
                     
                     # previously existing status of this favorite store
                     favorite = Favorite.query.filter_by(subscriber_id=subscriber.id, name=item_name).first()

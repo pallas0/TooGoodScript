@@ -32,6 +32,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db.init_app(app)
 
 
+
 CORS(app, resources={r"/*": {"origins": "https://too-good-frontend.vercel.app"}})
 
 scheduler = BackgroundScheduler()
@@ -60,6 +61,7 @@ def list_subscribers():
 def list_credentials():
     credentials = Credential.query.all()
     return '\n'.join([f"{credential.id}: {credential.access_token}, {credential.refresh_token}, {credential.user_id}, {credential.cookie}, {credential.subscriber_id}" for credential in credentials]), 200
+
 
 @app.route('/sms', methods=['POST'])
 def process_incoming_sms():
