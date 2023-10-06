@@ -3,14 +3,20 @@
 ## Table of Contents
 
 - [Description](#description)
+- [Screenshots](#screenshots)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Database Design](#database-design)
-- [Screenshots](#screenshots)
+
 
 ## Description
 
 The Too Good To Go SMS Alerts backend is responsible for populating and managing a database of users and their favorite stores' updates from the Too Good To Go platform. It sends SMS alerts to users when new batches of items become available from their favorite stores.
+
+## Screenshots
+<img width="1438" alt="Screenshot 2023-09-13 at 12 44 24 PM" src="https://github.com/pallas0/TooGoodScript/assets/52135849/209ca81c-02ee-43bb-8469-08e4939a6b89">
+
+![IMG_7084](https://github.com/pallas0/TooGoodScript/assets/52135849/2cd832b6-bf76-47c7-a4c3-1535d0b98792)
 
 ## Installation
 
@@ -85,11 +91,6 @@ The Too Good To Go SMS Alerts backend utilizes a relational database to store us
 
 This relational database design allows for efficient storage and retrieval of subscriber data, their associated credentials, and their favorite stores' availability status. The relationships between tables ensure data integrity and enable complex queries to provide SMS alerts based on user preferences.
 
-
-## Screenshots
-<img width="1438" alt="Screenshot 2023-09-13 at 12 44 24 PM" src="https://github.com/pallas0/TooGoodScript/assets/52135849/209ca81c-02ee-43bb-8469-08e4939a6b89">
-
-![IMG_7084](https://github.com/pallas0/TooGoodScript/assets/52135849/2cd832b6-bf76-47c7-a4c3-1535d0b98792)
 
 
   
