@@ -2,7 +2,6 @@
 
 TLDR: I enjoy the too good to go app, but it's annoying that I have to constantly check the app to see if my favorite restaurants have food available. Often, the hottest restaurants' bags run out in seconds. I therefore made a web app that anyone can sign up for that constantly hits the too good to go API and checks if there are bags available for any of a users favorite restaurants. 
 
-## Description
 This specific repository contains the backend code. The frontend can be found at LINK. 
 
 The Too Good To Go SMS Alerts backend is responsible for populating and managing a database of users and their favorite stores' updates from the Too Good To Go platform. It sends SMS alerts to users when new batches of items become available from their favorite stores.
