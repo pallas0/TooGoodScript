@@ -1,6 +1,6 @@
 # Too Good To Go SMS Alerts
 
-TLDR: I enjoy the too good to go app, but it's annoying that I have to constantly check the app to see if my favorite restaurants have food available. Often, the hottest restaurants' bags run out in seconds. I therefore made a web app that anyone can sign up for that constantly hits the too good to go API and checks if there are bags available for any of a users favorite restaurants. 
+TLDR: I enjoy the too good to go app, but it's annoying that I have to constantly check the app to see if my favorite restaurants have food available. Often, the hottest restaurants' bags run out in seconds. I therefore made a web app that anyone can sign up for that constantly hits the too good to go API and checks if there are bags available for any of a users favorite restaurants. SIGN UP AND GET YOUR FOOD HERE: too-good-frontend.vercel.app/
 
 This specific repository contains the backend code. The frontend can be found [here](https://github.com/pallas0/TooGood_frontend). 
 
