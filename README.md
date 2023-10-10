@@ -7,6 +7,8 @@ This specific repository contains the backend code. The frontend can be found [h
 The Too Good To Go SMS Alerts backend is responsible for populating and managing a database of users and their favorite stores' updates from the Too Good To Go platform. It sends SMS alerts to users when new batches of items become available from their favorite stores.
 
 ## Demo / Screenshots
+The demo vid is [here](https://www.loom.com/share/3556ac04a23b4d558a907021f58896c3?sid=9130706b-a8ca-46ce-b359-57f46fbdb13b).
+
 <img width="846" alt="Screenshot 2023-09-07 at 3 10 34 PM" src="https://github.com/pallas0/TooGood_frontend/assets/52135849/29d27323-00ac-4a17-8e04-cdb21521dd9a">
 
 
